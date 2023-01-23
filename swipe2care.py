@@ -8,7 +8,7 @@ import sqlite3
 from dotenv import load_dotenv
 import os
 
-conn = sqlite3.connect(r"/Users/danielszyc/Library/Application Support/Google/Chrome/Profile 2/Cookies")
+'''conn = sqlite3.connect(r"/Users/danielszyc/Library/Application Support/Google/Chrome/Profile 2/Cookies")
 
 # Create a cursor
 cursor = conn.cursor()
@@ -21,13 +21,12 @@ cookies = cursor.fetchall()
 
 # Close the cursor and connection
 cursor.close()
-conn.close()
+conn.close()'''
 
 options = Options()
 options.add_experimental_option("detach", True)
 options.add_argument('--user-data-dir=/Users/danielszyc/Library/Application Support/Google/Chrome/Profile 2')
 options.add_argument('--headless')
-
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=options)
 
 '''for cookie in cookies:
@@ -48,12 +47,14 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),optio
     continue'''
 
 driver.get("https://huskycardcenter.neu.edu/student/welcome.php")
-
 load_dotenv('.env')
+# login to mynortheastern
 username = driver.find_element(By.NAME, "j_username")
 password = driver.find_element(By.NAME, "j_password")
 username.send_keys(os.getenv('USERNAME'))
 password.send_keys(os.getenv('PASSWORD'))
+
+# at this point, DUO needs to be completed
 
 # navigate to CBORD welcome page https://huskycardcenter.neu.edu/student/welcome.php
 driver.find_element(By.NAME, "_eventId_proceed").click()
@@ -69,7 +70,7 @@ for i in range(3,0,-1):
   num_meals = driver.find_element(By.NAME, "meals_to_donate")
   num_meals.send_keys(str(i))
   driver.find_elements(By.TAG_NAME, "input")[1].click()
-  driver.save_screenshot('screenshots/ss'+str(i)+'.png')
+  #driver.save_screenshot('screenshots/ss'+str(i)+'.png')
   try:
     e = driver.find_element(By.TAG_NAME, "h2")
     if e.text != 'Donation Submitted':
@@ -78,11 +79,12 @@ for i in range(3,0,-1):
     break
   except:
     print('Error: '+e.text)
+    #return to meal input page to attempt submission of fewer swipes
     if e.text != "Above Weekly Donation Limit":
-      driver.find_elements(By.TAG_NAME, "input")[0].click()#return to meal input page
+      driver.find_elements(By.TAG_NAME, "input")[0].click()
+      continue
     break
 
-driver.save_screenshot('screeenshots/ss.png')
+#driver.save_screenshot('screeenshots/ss.png')
 driver.quit()
-
 
